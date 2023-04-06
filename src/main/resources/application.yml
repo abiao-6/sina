@@ -1,0 +1,72 @@
+server:
+  port: 21001
+  servlet:
+    context-path: /sina
+
+spring:
+  application:
+    name: sina
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  jmx:
+    default-domain: ${spring.application.name}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://*********************r
+    username: ********
+    password: ********
+  redis:
+    host: ********
+    port: ********
+    database: ********
+    password: ********
+  rabbitmq:
+    host: ********
+    port: ********
+    username: ********
+    password: ********
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ********
+
+### xxl-job admin address list, such as "http://address" or "http://address01,http://address02"
+
+xxl:
+  job:
+    admin:
+      addresses: http://********/xxl-job-admin  #xxljob调度中心部署  例如：http://127.0.0.1:8080/xxl-job-admin
+    executor:
+      appname: sina #xxljob配置的执行器名称，
+      ip:         #执行器IP，默认为空表示自动获取IP
+      port: 9999 #xxljob配置的端口号，默认为9999
+      logpath: /root/release/********/jobhandler  #执行器运行日志文件存储磁盘路径
+      logretentiondays: 30  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
+      address:
+    accessToken: #调度中心通讯TOKEN [选填]：非空时启用
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+#  configuration-properties: { dbSchema: spider. }
+
+logging:
+  level:
+    com.abiao.sina: debug
+  file: log/abiao-sina.log
+
+threadPool:
+  corePoolSize: 30
+  maximumPoolSize: 100
+  keepAliveTime: 60
+  blockingQueue: 500

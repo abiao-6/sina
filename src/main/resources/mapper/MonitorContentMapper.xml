@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "/WEB-INF/classes/mybatis-3-mapper.dtd">
+<mapper namespace="com.abiao.sina.dao.MonitorContentMapper">
+
+    <sql id="tableName">
+        spider.MONITOR
+    </sql>
+    <sql id="tableColumns">
+        ID,USER_UID,WEIBO_CONTENT,WEIBO_DATE
+    </sql>
+
+
+    <insert id="insert">
+        INSERT INTO
+        <include refid="tableName"/>
+        (<include refid="tableColumns"/>)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+        #{item.id},#{item.userUid},#{item.weiboContent},#{item.weiboDate}
+        )
+        </foreach>
+    </insert>
+    <select id="query" resultType="com.abiao.sina.entity.MonitorContent">
+        SELECT <include refid="tableColumns"/>
+        FROM <include refid="tableName"/>
+    </select>
+
+</mapper>

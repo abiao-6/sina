@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "/WEB-INF/classes/mybatis-3-mapper.dtd">
+<mapper namespace="com.abiao.sina.dao.MysqlUserMapper">
+
+    <sql id="tableName">
+        spider.USER
+    </sql>
+    <sql id="tableColumns">
+        ID,USER_UID,FOLLOWED_ID,FOLLOWED_NAME,IS_MONITORED, CREATOR,DATE_CREATED,
+        UPDATED_BY,DATE_UPDATED
+    </sql>
+
+
+    <insert id="insert">
+        INSERT INTO
+        <include refid="tableName"/>
+        (<include refid="tableColumns"/>)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+        #{item.id},#{item.userUid},#{item.followedId},#{item.followedName},#{item.isMonitored},#{item.creator},#{item.dateCreated},#{item.updatedBy},#{item.dateUpdated}
+        )
+        </foreach>
+    </insert>
+    <update id="initIsMonitored">
+        UPDATE
+        <include refid="tableName"/>
+        SET
+        IS_MONITORED = FALSE
+        WHERE USER_UID = #{userUid}
+    </update>
+    <update id="updateIsSpider">
+        UPDATE
+        <include refid="tableName"/>
+        SET
+        IS_MONITORED = TRUE
+        WHERE FOLLOWED_ID IN
+        <foreach collection="followedIds" item="followedId" open="(" close=")" separator=",">
+            #{followedId}
+        </foreach>
+    </update>
+    <update id="updateFollowedName">
+        UPDATE <include refid="tableName"/>
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="FOLLOWED_NAME =CASE" suffix="end,">
+                <foreach collection="list" item="i">
+                    when FOLLOWED_ID = #{i.followedId} then #{i.followedName}
+                </foreach>
+            </trim>
+        </trim>
+        WHERE FOLLOWED_ID IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item.followedId}
+        </foreach>
+    </update>
+    <select id="queryFolloweds" resultType="com.abiao.sina.entity.MysqlUser">
+        SELECT FOLLOWED_ID,FOLLOWED_NAME,IS_MONITORED
+        FROM <include refid="tableName"/>
+        WHERE USER_UID = #{userUid}
+    </select>
+    <select id="getFollowedByNameOrId" resultType="com.abiao.sina.entity.MysqlUser">
+        SELECT FOLLOWED_ID,FOLLOWED_NAME,IS_MONITORED
+        FROM <include refid="tableName"/>
+        <where>
+            USER_UID = #{USERuID}
+            <if test="followedId != null and followedId != ''">
+                AND FOLLOWED_ID LIKE '%' || #{followedId} || '%'
+            </if>
+            <if test="followedName != null and followedName != ''">
+                AND FOLLOWED_Name LIKE '%' || #{followedName} || '%'
+            </if>
+        </where>
+    </select>
+    <select id="getFollowedNameByIds" resultType="com.abiao.sina.entity.MysqlUser">
+        SELECT FOLLOWED_ID,FOLLOWED_NAME,IS_MONITORED
+        FROM <include refid="tableName"/>
+        WHERE USER_UID IN
+        <foreach collection="followedIds" item="followedId" open="(" close=")" separator=",">
+            #{followedId}
+        </foreach>
+    </select>
+    <select id="queryMonitored" resultType="com.abiao.sina.entity.MysqlUser">
+        SELECT
+        <include refid="tableColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE USER_UID = #{userUid} AND IS_MONITORED = 1
+    </select>
+</mapper>
